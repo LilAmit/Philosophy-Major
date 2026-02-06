@@ -912,7 +912,8 @@ h1, h2, h3, h4 {
 .lightbox-prev,
 .lightbox-next {
     position: absolute;
-    background: rgba(255, 255, 255, 0.1);
+    z-index: 10;
+    background: rgba(26, 92, 58, 0.85);
     border: none;
     color: white;
     font-size: 2rem;
@@ -1788,17 +1789,21 @@ h1, h2, h3, h4 {
         position: static;
         order: 0;
     }
-    
+
+    .logo-link-left {
+        order: 2;
+    }
+
     .logo {
         height: 40px;
     }
-    
+
     .main-nav {
         position: static;
         width: 100%;
-        order: 2;
+        order: 3;
     }
-    
+
     .header-title {
         order: 1;
         text-align: center;
@@ -1820,9 +1825,10 @@ h1, h2, h3, h4 {
     .lightbox-close,
     .lightbox-prev,
     .lightbox-next {
-        width: 45px;
-        height: 45px;
+        width: 48px;
+        height: 48px;
         font-size: 1.5rem;
+        background: rgba(26, 92, 58, 0.85);
     }
 
     .lightbox-close {
@@ -1831,11 +1837,11 @@ h1, h2, h3, h4 {
     }
 
     .lightbox-prev {
-        right: 10px;
+        right: 5px;
     }
 
     .lightbox-next {
-        left: 10px;
+        left: 5px;
     }
 }
 
