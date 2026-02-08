@@ -15,6 +15,15 @@ function initHeader() {
     const header = document.querySelector('.main-header');
     let lastScroll = 0;
 
+    // Set CSS variable for header height so content can adapt
+    function updateHeaderHeight() {
+        const height = header.offsetHeight;
+        document.documentElement.style.setProperty('--header-height', height + 'px');
+    }
+
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
 
