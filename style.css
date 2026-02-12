@@ -901,11 +901,72 @@ h1, h2, h3, h4 {
     border-radius: 10px;
     box-shadow: var(--shadow-lg);
     transform: scale(0.9);
-    transition: var(--transition-normal);
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .lightbox.active .lightbox-image {
     transform: scale(1);
+}
+
+/* Lightbox slide transitions */
+.lightbox-image.slide-out-left {
+    animation: slideOutLeft 0.2s ease-out forwards;
+}
+
+.lightbox-image.slide-out-right {
+    animation: slideOutRight 0.2s ease-out forwards;
+}
+
+.lightbox-image.slide-in-left {
+    animation: slideInLeft 0.2s ease-out forwards;
+}
+
+.lightbox-image.slide-in-right {
+    animation: slideInRight 0.2s ease-out forwards;
+}
+
+@keyframes slideOutLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-40px);
+        opacity: 0.4;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(40px);
+        opacity: 0.4;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-40px);
+        opacity: 0.4;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(40px);
+        opacity: 0.4;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .lightbox-close,

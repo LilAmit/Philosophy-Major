@@ -122,6 +122,8 @@ function initLightbox() {
     let currentImageIndex = 0;
     const images = Array.from(galleryItems).map(item => item.querySelector('img').src);
 
+    let isAnimating = false;
+
     function openLightbox(index) {
         currentImageIndex = index;
         lightboxImage.src = images[currentImageIndex];
@@ -134,14 +136,37 @@ function initLightbox() {
         document.body.style.overflow = '';
     }
 
+    function slideToImage(newIndex, slideDirection) {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        // RTL: next = slide right, prev = slide left
+        const outClass = slideDirection === 'right' ? 'slide-out-right' : 'slide-out-left';
+        const inClass = slideDirection === 'right' ? 'slide-in-right' : 'slide-in-left';
+
+        lightboxImage.classList.add(outClass);
+
+        setTimeout(() => {
+            lightboxImage.classList.remove(outClass);
+            currentImageIndex = newIndex;
+            lightboxImage.src = images[currentImageIndex];
+            lightboxImage.classList.add(inClass);
+
+            setTimeout(() => {
+                lightboxImage.classList.remove(inClass);
+                isAnimating = false;
+            }, 200);
+        }, 200);
+    }
+
     function showNext() {
-        currentImageIndex = (currentImageIndex + 1) % images.length;
-        lightboxImage.src = images[currentImageIndex];
+        const newIndex = (currentImageIndex + 1) % images.length;
+        slideToImage(newIndex, 'right');
     }
 
     function showPrev() {
-        currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
-        lightboxImage.src = images[currentImageIndex];
+        const newIndex = (currentImageIndex - 1 + images.length) % images.length;
+        slideToImage(newIndex, 'left');
     }
 
     // Event listeners
@@ -169,39 +194,61 @@ function initLightbox() {
                 closeLightbox();
                 break;
             case 'ArrowRight':
-                showPrev(); // RTL - right goes to previous
+                // RTL: right arrow = previous, slides left
+                showPrev();
                 break;
             case 'ArrowLeft':
-                showNext(); // RTL - left goes to next
+                // RTL: left arrow = next, slides right
+                showNext();
                 break;
         }
     });
 
-    // Touch swipe support
+    // Touch swipe support with drag follow effect
     let touchStartX = 0;
-    let touchEndX = 0;
+    let touchCurrentX = 0;
+    let isDragging = false;
 
     lightbox.addEventListener('touchstart', (e) => {
+        if (isAnimating) return;
         touchStartX = e.changedTouches[0].screenX;
+        touchCurrentX = touchStartX;
+        isDragging = true;
+        lightboxImage.style.transition = 'none';
+    });
+
+    lightbox.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        touchCurrentX = e.changedTouches[0].screenX;
+        const diff = touchCurrentX - touchStartX;
+        const dampedDiff = diff * 0.4;
+        const opacity = 1 - Math.abs(diff) / 800;
+        lightboxImage.style.transform = `translateX(${dampedDiff}px) scale(${1 - Math.abs(diff) / 2000})`;
+        lightboxImage.style.opacity = Math.max(opacity, 0.5);
     });
 
     lightbox.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
+        if (!isDragging) return;
+        isDragging = false;
+        lightboxImage.style.transition = '';
+        lightboxImage.style.transform = '';
+        lightboxImage.style.opacity = '';
 
-    function handleSwipe() {
+        const diff = touchStartX - e.changedTouches[0].screenX;
         const swipeThreshold = 50;
-        const diff = touchStartX - touchEndX;
 
         if (Math.abs(diff) > swipeThreshold) {
             if (diff > 0) {
-                showNext(); // Swipe left - next image (RTL)
+                // Swiped left in RTL = next = slide right
+                const newIndex = (currentImageIndex + 1) % images.length;
+                slideToImage(newIndex, 'right');
             } else {
-                showPrev(); // Swipe right - previous image (RTL)
+                // Swiped right in RTL = prev = slide left
+                const newIndex = (currentImageIndex - 1 + images.length) % images.length;
+                slideToImage(newIndex, 'left');
             }
         }
-    }
+    });
 }
 
 // ===== Smooth Scroll =====
